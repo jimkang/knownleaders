@@ -39,6 +39,7 @@
     "probable": "^2.1.4",
     "route-state": "^2.0.5",
     "seedrandom": "^3.0.5",
+    "split-to-words": "^2.0.0",
     "strokerouter": "^2.0.0"
   }
 }
