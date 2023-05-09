@@ -1,0 +1,44 @@
+{
+  "name": "knownleaders",
+  "version": "1.0.0",
+  "description": "Fake news about leaders.",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jimkang/knownleaders.git"
+  },
+  "keywords": [],
+  "author": "Jim Kang",
+  "license": "Polyform Noncommercial License 1.0",
+  "bugs": {
+    "url": "https://github.com/jimkang/knownleaders/issues"
+  },
+  "homepage": "https://github.com/jimkang/knownleaders",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^19.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "eslint": "^7.24.0",
+    "lodash.curry": "^4.1.1",
+    "prettier": "^2.8.3",
+    "rollup": "^2.50.6",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "sirv-cli": "^1.0.12"
+  },
+  "dependencies": {
+    "@jimkang/randomid": "^1.0.2",
+    "get-at-path": "^1.0.1",
+    "handle-error-web": "^1.0.1",
+    "one-listener-per-element": "^1.0.1",
+    "probable": "^2.1.4",
+    "route-state": "^2.0.5",
+    "seedrandom": "^3.0.5",
+    "strokerouter": "^2.0.0"
+  }
+}
