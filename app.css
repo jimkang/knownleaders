@@ -3,7 +3,6 @@ body {
   font-family: Helvetica, sans-serif;
   background: #fff;
   color: #333;
-  margin: 0;
   margin-bottom: 2rem;
 }
 
@@ -12,10 +11,10 @@ body {
 }
 
 #status-message {
-  background-color: hsla(0, 100%, 50%, 0.8);
+  background-color: hsla(53, 100%, 60%, 0.8);
   margin: 1rem;
   padding: 1rem;
-  text-shadow: none;
+  border-radius: 0.25rem;
 }
 
 ul {
@@ -23,19 +22,23 @@ ul {
 }
 
 button {
+  font-family: Helvetica;
   font-size: 1.2em;
   cursor: pointer;
   padding: 0.5em;
   border-radius: 0.5em;
-  border-width: 8px;
+  /*! border-width: 8px; */
   border-color: #333;
   border-style: solid;
   background-color: #fff;
   min-width: 44px;
+  padding-bottom: 0.25em;
 }
 
 .outer-container {
   display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 a:link {
@@ -61,16 +64,31 @@ a:visited {
   display: none;
 }
 
-#bone-canvas {
-  background-color: hsl(240, 25%, 25%);
+#leader-fact {
+  font-size: larger;
+  max-width: 16em;
+  text-align: center;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
-.control-pane {
-  position: fixed;
-  top: 8px;
-  right: 8px;
-  display: flex;
-  flex-direction: column;
+#thinking-icon {
+  display: inline-block;
+}
+
+.spinning {
+  transform-origin: center;
+  animation: 1s linear spin infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform-origin: center;
+    transform: rotate(359deg);
+  }
 }
 
 @media all and (max-height: 568px) {

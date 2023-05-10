@@ -11,6 +11,8 @@ var randomId = RandomId();
 var routeState;
 var probable;
 var leaderFactEl = document.getElementById('leader-fact');
+var thinkingIconEl = document.getElementById('thinking-icon');
+var messageEl = document.getElementById('status-message');
 
 (async function go() {
   window.onerror = reportTopLevelError;
@@ -38,9 +40,17 @@ async function followRoute({
     onReset: () => routeState.addToRoute({ seed: randomId(8) }),
   });
 
+  thinkingIconEl.classList.add('spinning');
+  messageEl.textContent = 'Retrieving leadership fact…';
+  messageEl.classList.remove('hidden');
+
   var factPack = await getLeaderFact({ probable, handleError, fetch: window.fetch });
   console.log('factPack', factPack);
+
   leaderFactEl.textContent = factPack.sentence;
+  thinkingIconEl.classList.remove('spinning');
+  messageEl.classList.add('hidden');
+  messageEl.textContent = '';
 }
 
 function reportTopLevelError(msg, url, lineNo, columnNo, error) {
