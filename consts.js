@@ -199,14 +199,19 @@ var commonFirstNames = [
   'Johnny',
   'Alexis',
   'Logan',
-  'Kayla'
+  'Kayla',
 ];
 
-const bandQuery = `SELECT ?group WHERE {
-  ?group wdt:P31/wdt:P279* wd:Q2088357          
+const queryBaseURL = 'https://query.wikidata.org/sparql?query=';
+
+function q(categoryEntityId) {
+  const query = `SELECT ?group WHERE {
+  ?group wdt:P31/wdt:P279* ${categoryEntityId}
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
 }
 `;
+  return `${queryBaseURL}${encodeURIComponent(query)}`;
+}
 
 const orgQuery = `SELECT ?group WHERE {
    ?group wdt:P31/wdt:P279* wd:Q43229     
@@ -216,6 +221,10 @@ const orgQuery = `SELECT ?group WHERE {
 
 module.exports = {
   commonFirstNames,
-  bandEntitiesURL: 'https://query.wikidata.org/sparql?query=' + encodeURIComponent(bandQuery),
-  orgEntitiesURL: 'https://query.wikidata.org/sparql?query=' + encodeURIComponent(orgQuery),
+  bandEntitiesURL: q`wd:Q2088357`,
+  orgEntitiesURL:
+    'https://query.wikidata.org/sparql?query=' + encodeURIComponent(orgQuery),
+  entityGetBaseURL:
+    'https://www.wikidata.org/w/api.php?action=wbgetentities&props=labels|sitelinks|claims&format=json&origin=*&ids=',
+  wikimediaImageBaseURL: 'https://commons.wikimedia.org/wiki/Special:FilePath/',
 };

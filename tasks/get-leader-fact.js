@@ -1,5 +1,10 @@
 var splitToWords = require('split-to-words');
-var { commonFirstNames, bandEntitiesURL } = require('../consts');
+var {
+  commonFirstNames,
+  bandEntitiesURL,
+  entityGetBaseURL,
+  wikimediaImageBaseURL,
+} = require('../consts');
 
 const languageCode = navigator.language.split('-').shift();
 
@@ -75,10 +80,7 @@ async function getRandomEntityFromWikidata({
 async function getEntityForWikidataId({ wikidataId, probable }) {
   // Putting origin * in the query gets the wikidata API to put the CORS
   // headers in?!
-  let res = await fetch(
-    `https://www.wikidata.org/w/api.php?action=wbgetentities&props=labels|sitelinks|claims&format=json&origin=*&ids=${wikidataId}`,
-    { mode: 'cors' }
-  );
+  let res = await fetch(`${entityGetBaseURL}${wikidataId}`, { mode: 'cors' });
   if (!res.ok) {
     return;
   }
@@ -112,8 +114,7 @@ async function getEntityForWikidataId({ wikidataId, probable }) {
 
   let imageURL = entity?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
   if (imageURL) {
-    imageURL =
-      'https://commons.wikimedia.org/wiki/Special:FilePath/' + imageURL;
+    imageURL = wikimediaImageBaseURL + imageURL;
   }
   console.log('imageURL', imageURL);
   // TODO: Get Bandcamp links?
