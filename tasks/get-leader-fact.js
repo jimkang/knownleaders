@@ -5,6 +5,7 @@ var {
   entityGetBaseURL,
   wikimediaImageBaseURL,
 } = require('../consts');
+const { createLeaderSentence } = require('./create-leader-sentence');
 
 const languageCode = navigator.language.split('-').shift();
 
@@ -43,7 +44,11 @@ async function getLeaderFact({
   return {
     groupEntity,
     leaderName,
-    sentence: `We all know that the group ${groupEntity.groupName} was founded by ${leaderName}.`,
+    sentence: createLeaderSentence({
+      groupName: groupEntity.groupName,
+      leaderName,
+      probable,
+    }),
   };
 }
 
