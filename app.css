@@ -24,15 +24,16 @@ ul {
 button {
   font-family: Helvetica;
   font-size: 1.2em;
+  font-weight: bold;
   cursor: pointer;
   padding: 0.5em;
   border-radius: 0.5em;
-  /*! border-width: 8px; */
   border-color: #333;
   border-style: solid;
   background-color: #fff;
   min-width: 44px;
   padding-bottom: 0.25em;
+  margin-top: 1em;
 }
 
 .outer-container {
@@ -65,7 +66,7 @@ a:visited {
 }
 
 #leader-fact {
-  font-size: larger;
+  font-size: xxx-large;
   max-width: 16em;
   text-align: center;
   margin-top: 1em;

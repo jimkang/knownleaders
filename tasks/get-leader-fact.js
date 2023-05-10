@@ -1,50 +1,43 @@
 var splitToWords = require('split-to-words');
-var { commonFirstNames, bandQueryURL } = require('../consts');
+var { commonFirstNames, bandEntitiesURL } = require('../consts');
+
+const languageCode = navigator.language.split('-').shift();
 
 // var wikidataIdRegex = /Q\d+$/;
 
-async function getLeaderFact({ probable, handleError, fetch, maxTries = 100 }) {
-  var wdObjects;
+async function getLeaderFact({ probable, handleError, fetch }) {
+  var groupEntity;
 
   try {
-    wdObjects = await Promise.all([
-      getFromWikidata(fetch, bandQueryURL),
-      // getFromWikidata('https://query.wikidata.org/sparql?query=SELECT%20%3Fname%20%3FnameLabel%20WHERE%20%7B%0A%20%20%3Fname%20wdt%3AP31%20wd%3AQ202444.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0A')
-    ]);
+    groupEntity = await getRandomEntityFromWikidata({
+      fetch,
+      entitiesURL: bandEntitiesURL,
+      probable,
+    });
   } catch (error) {
     handleError(error);
   }
-  var groupsObj = wdObjects[0];
-  // var namesObj = wdObjects[1];
 
-  var wikidataURL;
-  var groupName;
-  for (let i = 0; i < maxTries; ++i) {
-    let selectedGroupObj = probable.pick(groupsObj?.results?.bindings || []);
-    wikidataURL = selectedGroupObj?.group?.value;
-    groupName = selectedGroupObj?.groupLabel?.value;
-    if (!wikidataURL.includes(groupName)) {
-      break;
-    }
-    // Some query results put the wikidata id in the name slot. If we hit one of those, keep looking.
-  }
-
-  const groupWords = splitToWords(groupName);
+  const groupWords = splitToWords(groupEntity.groupName);
   // const selectedLeaderObj = probable.pick(namesObj?.results?.bindings || []);
   // const leaderGivenName = selectedLeaderObj?.nameLabel?.value;
   const leaderGivenName = probable.pick(commonFirstNames);
   const leaderName = leaderGivenName + ' ' + groupWords[groupWords.length - 1];
 
   return {
-    wikidataURL,
-    groupName,
+    groupEntity,
     leaderName,
-    sentence: `We all know that the group ${groupName} was founded by ${leaderName}.`,
+    sentence: `We all know that the group ${groupEntity.groupName} was founded by ${leaderName}.`,
   };
 }
 
-async function getFromWikidata(fetch, url) {
-  var res = await fetch(url, {
+async function getRandomEntityFromWikidata({
+  fetch,
+  entitiesURL,
+  probable,
+  maxTries = 100,
+}) {
+  var res = await fetch(entitiesURL, {
     headers: { Accept: 'application/sparql-results+json' },
   });
   if (!res.ok) {
@@ -55,7 +48,53 @@ async function getFromWikidata(fetch, url) {
 
   var parsed = await res.json();
   console.log(parsed);
-  return parsed;
+
+  for (let i = 0; i < maxTries; ++i) {
+    let selectedGroupObj = probable.pick(parsed?.results?.bindings || []);
+    const wikidataURL = selectedGroupObj?.group?.value;
+    console.log(wikidataURL);
+    const wikidataId = wikidataURL.split('/').pop();
+    // Putting origin * in the query gets the wikidata API to put the CORS
+    // headers in?!
+    let res = await fetch(
+      `https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*&ids=${wikidataId}`,
+      { mode: 'cors' }
+    );
+    if (!res.ok) {
+      continue;
+    }
+    let entityResult = await res.json();
+    let entity = entityResult?.entities[wikidataId];
+    if (!entity) {
+      continue;
+    }
+    console.log(entity);
+    let groupName = entity?.labels[languageCode]?.value;
+    if (!groupName && entity.labels) {
+      groupName = probable.pick(Object.values(entity.labels))?.value;
+    }
+    if (!groupName) {
+      continue;
+    }
+
+    let wikipediaURL;
+    if (entity.sitelinks) {
+      let sitelink = entity.sitelinks[languageCode + 'wiki'];
+      if (!sitelink) {
+        sitelink = probable.pick(Object.values(entity.sitelinks));
+      }
+      if (sitelink) {
+        wikipediaURL = `https://${sitelink.site.replace(/wiki$/, '')}.wikipedia.org/wiki/${sitelink.title}`;
+      }
+    }
+    // TODO: Get Bandcamp links?
+
+    return {
+      groupName,
+      wikidataId,
+      wikipediaURL,
+    };
+  }
 }
 
 module.exports = { getLeaderFact };

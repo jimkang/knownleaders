@@ -13,6 +13,7 @@ var probable;
 var leaderFactEl = document.getElementById('leader-fact');
 var thinkingIconEl = document.getElementById('thinking-icon');
 var messageEl = document.getElementById('status-message');
+var groupLinkEl = document.getElementById('group-link');
 
 (async function go() {
   window.onerror = reportTopLevelError;
@@ -48,6 +49,13 @@ async function followRoute({
   console.log('factPack', factPack);
 
   leaderFactEl.textContent = factPack.sentence;
+  if (factPack.groupEntity.wikipediaURL) {
+    groupLinkEl.setAttribute('href', factPack.groupEntity.wikipediaURL);
+    groupLinkEl.textContent = 'Do your own research.';
+  } else {
+    groupLinkEl.textContent = '';
+  }
+
   thinkingIconEl.classList.remove('spinning');
   messageEl.classList.add('hidden');
   messageEl.textContent = '';

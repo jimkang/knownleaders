@@ -202,7 +202,20 @@ var commonFirstNames = [
   'Kayla'
 ];
 
+const bandQuery = `SELECT ?group WHERE {
+  ?group wdt:P31/wdt:P279* wd:Q2088357          
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+`;
+
+const orgQuery = `SELECT ?group WHERE {
+   ?group wdt:P31/wdt:P279* wd:Q43229     
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+`;
+
 module.exports = {
   commonFirstNames,
-  bandQueryURL: 'https://query.wikidata.org/sparql?query=SELECT%20%3Fgroup%20%3FgroupLabel%20WHERE%20%7B%0A%20%20%3Fgroup%20wdt%3AP31%20wd%3AQ2088357.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0A'
+  bandEntitiesURL: 'https://query.wikidata.org/sparql?query=' + encodeURIComponent(bandQuery),
+  orgEntitiesURL: 'https://query.wikidata.org/sparql?query=' + encodeURIComponent(orgQuery),
 };
