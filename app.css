@@ -73,6 +73,10 @@ a:visited {
   margin-bottom: 1em;
 }
 
+#group-image {
+  max-width: 60%;
+}
+
 #thinking-icon {
   display: inline-block;
 }

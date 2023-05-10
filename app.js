@@ -14,6 +14,7 @@ var leaderFactEl = document.getElementById('leader-fact');
 var thinkingIconEl = document.getElementById('thinking-icon');
 var messageEl = document.getElementById('status-message');
 var groupLinkEl = document.getElementById('group-link');
+var groupImageEl = document.getElementById('group-image');
 
 (async function go() {
   window.onerror = reportTopLevelError;
@@ -54,6 +55,13 @@ async function followRoute({
     groupLinkEl.textContent = 'Do your own research.';
   } else {
     groupLinkEl.textContent = '';
+  }
+  if (factPack.groupEntity.imageURL) {
+    groupImageEl.setAttribute('src', factPack.groupEntity.imageURL);
+    groupImageEl.setAttribute('alt', factPack.groupEntity.groupName);
+  } else {
+    groupImageEl.removeAttribute('src');
+    groupImageEl.removeAttribute('alt');
   }
 
   thinkingIconEl.classList.remove('spinning');

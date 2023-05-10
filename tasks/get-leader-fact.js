@@ -47,17 +47,15 @@ async function getRandomEntityFromWikidata({
   }
 
   var parsed = await res.json();
-  console.log(parsed);
 
   for (let i = 0; i < maxTries; ++i) {
     let selectedGroupObj = probable.pick(parsed?.results?.bindings || []);
     const wikidataURL = selectedGroupObj?.group?.value;
-    console.log(wikidataURL);
     const wikidataId = wikidataURL.split('/').pop();
     // Putting origin * in the query gets the wikidata API to put the CORS
     // headers in?!
     let res = await fetch(
-      `https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*&ids=${wikidataId}`,
+      `https://www.wikidata.org/w/api.php?action=wbgetentities&props=labels|sitelinks|claims&format=json&origin=*&ids=${wikidataId}`,
       { mode: 'cors' }
     );
     if (!res.ok) {
@@ -68,7 +66,6 @@ async function getRandomEntityFromWikidata({
     if (!entity) {
       continue;
     }
-    console.log(entity);
     let groupName = entity?.labels[languageCode]?.value;
     if (!groupName && entity.labels) {
       groupName = probable.pick(Object.values(entity.labels))?.value;
@@ -87,12 +84,19 @@ async function getRandomEntityFromWikidata({
         wikipediaURL = `https://${sitelink.site.replace(/wiki$/, '')}.wikipedia.org/wiki/${sitelink.title}`;
       }
     }
+
+    let imageURL = entity?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
+    if (imageURL) {
+      imageURL = 'https://commons.wikimedia.org/wiki/Special:FilePath/' + imageURL;
+    }
+    console.log('imageURL', imageURL);
     // TODO: Get Bandcamp links?
 
     return {
       groupName,
       wikidataId,
       wikipediaURL,
+      imageURL
     };
   }
 }
