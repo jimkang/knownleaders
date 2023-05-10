@@ -27,9 +27,7 @@ var groupImageEl = document.getElementById('group-image');
   routeState.routeFromHash();
 })();
 
-async function followRoute({
-  seed,
-}) {
+async function followRoute({ seed, wikidataId }) {
   if (!seed) {
     routeState.addToRoute({ seed: randomId(8) });
     return;
@@ -39,14 +37,20 @@ async function followRoute({
   probable = Probable({ random });
 
   wireControls({
-    onReset: () => routeState.addToRoute({ seed: randomId(8) }),
+    onReset: () => routeState.addToRoute({ seed: randomId(8), wikidataId: '' }),
   });
 
   thinkingIconEl.classList.add('spinning');
   messageEl.textContent = 'Retrieving leadership fact…';
   messageEl.classList.remove('hidden');
 
-  var factPack = await getLeaderFact({ probable, handleError, fetch: window.fetch });
+  var factPack = await getLeaderFact({
+    probable,
+    handleError,
+    fetch: window.fetch,
+    routeState,
+    wikidataId,
+  });
   console.log('factPack', factPack);
 
   leaderFactEl.textContent = factPack.sentence;
