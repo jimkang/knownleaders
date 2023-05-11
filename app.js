@@ -7,7 +7,7 @@ import RandomId from '@jimkang/randomid';
 import { createProbable as Probable } from 'probable';
 import { getLeaderFact } from './tasks/get-leader-fact';
 
-var randomId = RandomId();
+var randomId = RandomId({ onlyLowercase: true });
 var routeState;
 var probable;
 var leaderFactEl = document.getElementById('leader-fact');
@@ -27,13 +27,16 @@ var groupImageEl = document.getElementById('group-image');
   routeState.routeFromHash();
 })();
 
-async function followRoute({ seed, wikidataId, groupType }) {
+function followRoute({ seed, wikidataId, groupType }) {
+  var routeUpdates = {};
   if (!seed) {
-    routeState.addToRoute({ seed: randomId(8) });
-    return;
+    routeUpdates.seed = randomId(8);
   }
   if (!groupType) {
-    routeState.addToRoute({ groupType: 'music-group' });
+    routeUpdates.groupType = 'music-group';
+  }
+  if (Object.keys(routeUpdates).length > 0) {
+    routeState.addToRoute(routeUpdates);
     return;
   }
 
@@ -41,46 +44,52 @@ async function followRoute({ seed, wikidataId, groupType }) {
   probable = Probable({ random });
 
   wireControls({
-    onReset: () => routeState.addToRoute({ seed: randomId(8), wikidataId: '' }),
+    // Don't update by blanking out wikidataId in the route because that will
+    // add a history item that makes it unpleasant to try to get back to a 
+    // previous leader in the browsing session.
+    onReset: () => updateLeader({ wikidataId: null }),
     onGroupTypeChange: (groupType) => routeState.addToRoute({ groupType }),
     groupType,
   });
 
-  thinkingIconEl.classList.add('spinning');
-  messageEl.textContent = 'Retrieving leadership fact…';
-  messageEl.classList.remove('hidden');
+  updateLeader({ wikidataId });
 
-  var factPack = await getLeaderFact({
-    probable,
-    handleError,
-    fetch: window.fetch,
-    routeState,
-    wikidataId,
-    groupType,
-  });
-  console.log('factPack', factPack);
+  async function updateLeader({ wikidataId }) {
+    thinkingIconEl.classList.add('spinning');
+    messageEl.textContent = 'Retrieving leadership fact…';
+    messageEl.classList.remove('hidden');
 
-  leaderFactEl.innerHTML = factPack.sentence;
-  if (factPack.groupEntity.wikipediaURL) {
-    groupLinkEl.setAttribute('href', factPack.groupEntity.wikipediaURL);
-    groupLinkEl.textContent = 'Do your own research.';
-  } else {
-    groupLinkEl.textContent = '';
+    var factPack = await getLeaderFact({
+      probable,
+      handleError,
+      fetch: window.fetch,
+      routeState,
+      wikidataId,
+      groupType,
+    });
+
+    leaderFactEl.innerHTML = factPack.sentence;
+    if (factPack.groupEntity.wikipediaURL) {
+      groupLinkEl.setAttribute('href', factPack.groupEntity.wikipediaURL);
+      groupLinkEl.textContent = 'Do your own research.';
+    } else {
+      groupLinkEl.textContent = '';
+    }
+    if (factPack.groupEntity.imageURL) {
+      groupImageEl.setAttribute('src', factPack.groupEntity.imageURL);
+      groupImageEl.setAttribute('alt', factPack.groupEntity.groupName);
+      groupImageEl.classList.remove('hidden');
+    } else {
+      groupImageEl.removeAttribute('src');
+      groupImageEl.removeAttribute('alt');
+      // On Mobile Safari, an img with its src removed still takes up space.
+      groupImageEl.classList.add('hidden');
+    }
+
+    thinkingIconEl.classList.remove('spinning');
+    messageEl.classList.add('hidden');
+    messageEl.textContent = '';
   }
-  if (factPack.groupEntity.imageURL) {
-    groupImageEl.setAttribute('src', factPack.groupEntity.imageURL);
-    groupImageEl.setAttribute('alt', factPack.groupEntity.groupName);
-    groupImageEl.classList.remove('hidden');
-  } else {
-    groupImageEl.removeAttribute('src');
-    groupImageEl.removeAttribute('alt');
-    // On Mobile Safari, an img with its src removed still takes up space.
-    groupImageEl.classList.add('hidden');
-  }
-
-  thinkingIconEl.classList.remove('spinning');
-  messageEl.classList.add('hidden');
-  messageEl.textContent = '';
 }
 
 function reportTopLevelError(msg, url, lineNo, columnNo, error) {

@@ -123,7 +123,6 @@ async function getEntityForWikidataId({ wikidataId, probable }) {
   if (imageURL) {
     imageURL = wikimediaImageBaseURL + imageURL;
   }
-  console.log('imageURL', imageURL);
   // TODO: Get Bandcamp links?
 
   return {
