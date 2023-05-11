@@ -70,9 +70,12 @@ async function followRoute({ seed, wikidataId, groupType }) {
   if (factPack.groupEntity.imageURL) {
     groupImageEl.setAttribute('src', factPack.groupEntity.imageURL);
     groupImageEl.setAttribute('alt', factPack.groupEntity.groupName);
+    groupImageEl.classList.remove('hidden');
   } else {
     groupImageEl.removeAttribute('src');
     groupImageEl.removeAttribute('alt');
+    // On Mobile Safari, an img with its src removed still takes up space.
+    groupImageEl.classList.add('hidden');
   }
 
   thinkingIconEl.classList.remove('spinning');
