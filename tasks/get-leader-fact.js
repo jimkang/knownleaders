@@ -1,7 +1,7 @@
 var splitToWords = require('split-to-words');
 var {
   commonFirstNames,
-  bandEntitiesURL,
+  entitiesURLsForGroupType,
   entityGetBaseURL,
   wikimediaImageBaseURL,
 } = require('../consts');
@@ -17,6 +17,7 @@ async function getLeaderFact({
   fetch,
   routeState,
   wikidataId,
+  groupType
 }) {
   var groupEntity;
 
@@ -26,7 +27,7 @@ async function getLeaderFact({
     } else {
       groupEntity = await getRandomEntityFromWikidata({
         fetch,
-        entitiesURL: bandEntitiesURL,
+        entitiesURL: entitiesURLsForGroupType[groupType],
         probable,
         routeState,
       });
@@ -39,12 +40,13 @@ async function getLeaderFact({
   // const selectedLeaderObj = probable.pick(namesObj?.results?.bindings || []);
   // const leaderGivenName = selectedLeaderObj?.nameLabel?.value;
   const leaderGivenName = probable.pick(commonFirstNames);
-  const leaderName = leaderGivenName + ' ' + groupWords[groupWords.length - 1];
+  const leaderName = leaderGivenName + ' ' + captializeFirstChar(groupWords[groupWords.length - 1]);
 
   return {
     groupEntity,
     leaderName,
     sentence: createLeaderSentence({
+      groupType,
       groupName: groupEntity.groupName,
       leaderName,
       probable,
@@ -130,6 +132,13 @@ async function getEntityForWikidataId({ wikidataId, probable }) {
     wikipediaURL,
     imageURL,
   };
+}
+
+function captializeFirstChar(s) {
+  if (s.length < 1) {
+    return s;
+  }
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 module.exports = { getLeaderFact };

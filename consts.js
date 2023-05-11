@@ -200,6 +200,7 @@ var commonFirstNames = [
   'Alexis',
   'Logan',
   'Kayla',
+  'Joey',
 ];
 
 const queryBaseURL = 'https://query.wikidata.org/sparql?query=';
@@ -219,9 +220,19 @@ const orgQuery = `SELECT ?group WHERE {
 }
 `;
 
+var entitiesURLsForGroupType = {
+  'music-group': q`wd:Q2088357`,
+  game: q`wd:Q11410`,
+  novel: q`wd:Q8261`,
+  // company: q`wd:Q4830453`,
+  // nation: q`wd:Q6266`,
+  // religion: q`wd:Q9174`,
+  organization: q`wd:Q43229`
+};
+
 module.exports = {
   commonFirstNames,
-  bandEntitiesURL: q`wd:Q2088357`,
+  entitiesURLsForGroupType,
   orgEntitiesURL:
     'https://query.wikidata.org/sparql?query=' + encodeURIComponent(orgQuery),
   entityGetBaseURL:

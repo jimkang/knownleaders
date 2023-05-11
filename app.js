@@ -27,9 +27,13 @@ var groupImageEl = document.getElementById('group-image');
   routeState.routeFromHash();
 })();
 
-async function followRoute({ seed, wikidataId }) {
+async function followRoute({ seed, wikidataId, groupType }) {
   if (!seed) {
     routeState.addToRoute({ seed: randomId(8) });
+    return;
+  }
+  if (!groupType) {
+    routeState.addToRoute({ groupType: 'music-group' });
     return;
   }
 
@@ -38,6 +42,8 @@ async function followRoute({ seed, wikidataId }) {
 
   wireControls({
     onReset: () => routeState.addToRoute({ seed: randomId(8), wikidataId: '' }),
+    onGroupTypeChange: (groupType) => routeState.addToRoute({ groupType }),
+    groupType,
   });
 
   thinkingIconEl.classList.add('spinning');
@@ -50,10 +56,11 @@ async function followRoute({ seed, wikidataId }) {
     fetch: window.fetch,
     routeState,
     wikidataId,
+    groupType,
   });
   console.log('factPack', factPack);
 
-  leaderFactEl.textContent = factPack.sentence;
+  leaderFactEl.innerHTML = factPack.sentence;
   if (factPack.groupEntity.wikipediaURL) {
     groupLinkEl.setAttribute('href', factPack.groupEntity.wikipediaURL);
     groupLinkEl.textContent = 'Do your own research.';

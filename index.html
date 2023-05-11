@@ -8,13 +8,26 @@
   </head>
   <body class="outer-container">
     <div class="" id="thinking-icon">🤔</div>
-    
-    <h1 id="leader-fact"></h1>
 
-    <img id="group-image">
+    <main>
+      <h1 id="leader-fact"></h1>
+      <img id="group-image" />
+      <a id="group-link"></a>
+    </main>
 
-    <a id="group-link"></a>
     <span id="status-message" class="hidden"></span>
+
+    <label for="group-type-select"
+      >The kind of group to get a leader fact about:</label
+    >
+    <select id="group-type-select">
+      <option value="music-group">Music group</option>
+      <option value="game">Game</option>
+      <option value="novel">Novel</option>
+      <option value="organization">
+        Any organization (warning: might take a while)
+      </option>
+    </select>
     <button id="reset-button">Get a new leader fact</button>
 
     <div id="version-info"></div>
