@@ -106,4 +106,7 @@ main {
   body {
     font-size: 18px;
   }
+  #leader-fact {
+    font-size: xx-large;
+  }
 }
