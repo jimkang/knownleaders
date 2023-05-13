@@ -48,7 +48,14 @@ function followRoute({ seed, wikidataId, groupType }) {
     // add a history item that makes it unpleasant to try to get back to a 
     // previous leader in the browsing session.
     onReset: () => updateLeader({ wikidataId: null }),
-    onGroupTypeChange: (groupType) => routeState.addToRoute({ groupType }),
+    onGroupTypeChange(gt) {
+      // If the groupType selection changes, update the route but follow it
+      // because we don't want the leader fact to change until the reset button
+      // is clicked.
+      routeState.addToRoute({ groupType: gt }, false);
+      // However, we DO want groupType to be update for when onReset is called!
+      groupType = gt;
+    },
     groupType,
   });
 
