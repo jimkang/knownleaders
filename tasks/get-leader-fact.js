@@ -7,6 +7,8 @@ var {
 } = require('../consts');
 const { createLeaderSentence } = require('./create-leader-sentence');
 
+var basicWordBoundaryRegex = /[ ,;!?]/;
+
 const languageCode = navigator.language.split('-').shift();
 
 // var wikidataIdRegex = /Q\d+$/;
@@ -17,7 +19,7 @@ async function getLeaderFact({
   fetch,
   routeState,
   wikidataId,
-  groupType
+  groupType,
 }) {
   var groupEntity;
 
@@ -36,11 +38,11 @@ async function getLeaderFact({
     handleError(error);
   }
 
-  const groupWords = splitToWords(groupEntity.groupName);
   // const selectedLeaderObj = probable.pick(namesObj?.results?.bindings || []);
   // const leaderGivenName = selectedLeaderObj?.nameLabel?.value;
   const leaderGivenName = probable.pick(commonFirstNames);
-  const leaderName = leaderGivenName + ' ' + captializeFirstChar(groupWords[groupWords.length - 1]);
+  const leaderSurname = getSurnameFromGroupName(groupEntity.groupName);
+  const leaderName = leaderGivenName + ' ' + leaderSurname;
 
   return {
     groupEntity,
@@ -138,6 +140,17 @@ function captializeFirstChar(s) {
     return s;
   }
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function getSurnameFromGroupName(groupName) {
+  var words = splitToWords(groupName).filter(
+    (word) => word.length > 0 && !basicWordBoundaryRegex.test(word.charAt(0))
+  );
+  if (words.length < 1) {
+    return '';
+  }
+  var word = words[words.length - 1];
+  return captializeFirstChar(word);
 }
 
 module.exports = { getLeaderFact };
