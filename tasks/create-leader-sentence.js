@@ -52,6 +52,7 @@ var leaderRoleDefsForGroupTypes = {
     [1, 'torchbearer'],
     [4, 'lead guitarist'],
     [4, 'lead singer'],
+    [1, 'lead guitarist and lead singer'],
     [5, 'MC'],
     [5, 'DJ'],
     [4, 'lead dancer'],
@@ -104,22 +105,14 @@ function createLeaderSentence({ groupName, leaderName, probable, groupType }) {
 
   if (groupType === 'game') {
     formatTableDef = [
-      [
-        1,
-        (g, l) =>
-          `${l} is the ${leaderRoleTable.roll()} of the game ${g}.`,
-      ],
+      [1, (g, l) => `${l} is the ${leaderRoleTable.roll()} of the game ${g}.`],
     ];
   }
 
   if (groupType === 'novel') {
     groupName = `<u>${groupName}</u>`;
     formatTableDef = [
-      [
-        1,
-        (g, l) =>
-          `${l} is the ${leaderRoleTable.roll()} in ${g}.`,
-      ],
+      [1, (g, l) => `${l} is the ${leaderRoleTable.roll()} in ${g}.`],
     ];
   }
 

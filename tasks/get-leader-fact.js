@@ -7,6 +7,8 @@ var {
 const { createLeaderSentence } = require('./create-leader-sentence');
 
 var basicWordBoundaryRegex = /[ ,;!?()]/;
+var allNumberishRegex = /^[\d\-–+.]+$/;
+var allCapsRegex = /^[A-Z]+$/g;
 
 const languageCode = navigator.language.split('-').shift();
 
@@ -122,15 +124,39 @@ function captializeFirstChar(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+function makeTitleCase(s) {
+  if (s.length < 1) {
+    return s;
+  }
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
 function getSurnameFromGroupName(groupName) {
-  var words = splitToWords(groupName).filter(
-    (word) => word.length > 0 && !basicWordBoundaryRegex.test(word.charAt(0))
-  );
+  var words = splitToWords(groupName).filter(isUsableAsSurname);
   if (words.length < 1) {
     return '';
   }
   var word = words[words.length - 1];
+  if (allCapsRegex.test(word)) {
+    return makeTitleCase(word);
+  }
   return captializeFirstChar(word);
+}
+
+function isUsableAsSurname(word) {
+  if (word.length < 1) {
+    return false;
+  }
+
+  if (basicWordBoundaryRegex.test(word.charAt(0))) {
+    return false;
+  }
+
+  if (allNumberishRegex.test(word)) {
+    return false;
+  }
+
+  return true;
 }
 
 module.exports = {
