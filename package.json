@@ -1,6 +1,6 @@
 {
   "name": "knownleaders",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Fake news about leaders.",
   "main": "index.js",
   "private": true,
