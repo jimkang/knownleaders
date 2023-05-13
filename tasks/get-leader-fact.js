@@ -6,7 +6,7 @@ var {
 } = require('../consts');
 const { createLeaderSentence } = require('./create-leader-sentence');
 
-var basicWordBoundaryRegex = /[ ,;!?]/;
+var basicWordBoundaryRegex = /[ ,;!?()]/;
 
 const languageCode = navigator.language.split('-').shift();
 
