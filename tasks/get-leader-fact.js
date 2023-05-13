@@ -1,7 +1,6 @@
 var splitToWords = require('split-to-words');
 var {
   commonFirstNames,
-  entitiesURLsForGroupType,
   entityGetBaseURL,
   wikimediaImageBaseURL,
 } = require('../consts');
@@ -13,34 +12,16 @@ const languageCode = navigator.language.split('-').shift();
 
 // var wikidataIdRegex = /Q\d+$/;
 
-async function getLeaderFact({
+function getLeaderFactForEntity({
   probable,
-  handleError,
-  fetch,
-  routeState,
-  wikidataId,
+  // Currently only using groupName from groupEntity, but may later use other stuff.
+  groupEntity,
   groupType,
 }) {
-  var groupEntity;
-
-  try {
-    if (wikidataId) {
-      groupEntity = await getEntityForWikidataId({ wikidataId, probable });
-    } else {
-      groupEntity = await getRandomEntityFromWikidata({
-        fetch,
-        entitiesURL: entitiesURLsForGroupType[groupType],
-        probable,
-        routeState,
-      });
-    }
-  } catch (error) {
-    handleError(error);
-  }
+  const leaderGivenName = probable.pick(commonFirstNames);
 
   // const selectedLeaderObj = probable.pick(namesObj?.results?.bindings || []);
   // const leaderGivenName = selectedLeaderObj?.nameLabel?.value;
-  const leaderGivenName = probable.pick(commonFirstNames);
   const leaderSurname = getSurnameFromGroupName(groupEntity.groupName);
   const leaderName = leaderGivenName + ' ' + leaderSurname;
 
@@ -56,12 +37,12 @@ async function getLeaderFact({
   };
 }
 
+// Throws
 async function getRandomEntityFromWikidata({
   fetch,
   entitiesURL,
   probable,
   maxTries = 100,
-  routeState,
 }) {
   var res = await fetch(entitiesURL, {
     headers: { Accept: 'application/sparql-results+json' },
@@ -78,15 +59,14 @@ async function getRandomEntityFromWikidata({
     let selectedGroupObj = probable.pick(parsed?.results?.bindings || []);
     const wikidataURL = selectedGroupObj?.group?.value;
     const wikidataId = wikidataURL.split('/').pop();
-    let entity = await getEntityForWikidataId({ wikidataId, probable });
+    let entity = await getEntityForWikidataId({ wikidataId, probable, fetch });
     if (entity) {
-      routeState.addToRoute({ wikidataId }, false);
       return entity;
     }
   }
 }
 
-async function getEntityForWikidataId({ wikidataId, probable }) {
+async function getEntityForWikidataId({ wikidataId, probable, fetch }) {
   // Putting origin * in the query gets the wikidata API to put the CORS
   // headers in?!
   let res = await fetch(`${entityGetBaseURL}${wikidataId}`, { mode: 'cors' });
@@ -153,4 +133,8 @@ function getSurnameFromGroupName(groupName) {
   return captializeFirstChar(word);
 }
 
-module.exports = { getLeaderFact };
+module.exports = {
+  getLeaderFactForEntity,
+  getRandomEntityFromWikidata,
+  getEntityForWikidataId,
+};
