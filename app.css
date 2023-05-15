@@ -63,6 +63,11 @@ a:visited {
   color: #ddd;
 }
 
+footer {
+  font-size: small;
+  margin-top: 5rem;
+}
+
 #version-info {
   position: absolute;
   right: 1.5em;
